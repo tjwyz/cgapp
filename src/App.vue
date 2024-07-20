@@ -1,28 +1,37 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+    <CgHeader></CgHeader>
+    <div class="page-container">
+      <CgNav></CgNav>
+      <router-view></router-view> <!-- 显示匹配的组件 -->
+    </div>
   </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
-
+import CgHeader from './components/Header.vue';
+import CgNav from './components/Nav.vue';
 export default {
-  name: "App",
+  name: 'App',
   components: {
-    HelloWorld,
-  },
+    CgHeader,
+    CgNav
+  }
 };
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+/* 样式 */
+body, #app {
+  margin: 0;
+}
+
+.page-container {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 40px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
