@@ -1,8 +1,6 @@
 "use strict";
-
 const path = require('path');
-
-
+const { v4: uuidv4 } = require('uuid');
 import { app, protocol, BrowserWindow, ipcMain } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
@@ -12,33 +10,123 @@ const isDevelopment = process.env.NODE_ENV !== "production";
 protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } },
 ]);
-async function createWindow() {
-  // Create the browser window.
-  const win = new BrowserWindow({
-    width: 1800,
-    height: 1600,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'), // 设置预加载脚本路径
-      webSecurity: false,
-      nodeIntegration: false,
-      contextIsolation: true,  // 关闭上下文隔离，允许 <webview> 中的网页访问 Node.js API
-      webviewTag: true,  // 允许使用 <webview> 标签
-      nativeWindowOpen: true // 启用 nativeWindowOpen
-    },
-    frame: false,
-  });
-  console.log(process.env.WEBPACK_DEV_SERVER_URL);
-  if (process.env.WEBPACK_DEV_SERVER_URL) {
-    // Load the url of the dev server if in development mode
-    await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL);
-    // if (!process.env.IS_TEST) win.webContents.openDevTools();
-  } else {
-    createProtocol("app");
-    // Load the index.html when not in development
-    win.loadURL("app://./index.html");
+
+class WindowManager {
+  constructor() {
+    this.windows = {};
   }
-  return win;
+
+  // 创建一个新窗口并返回
+  createWindow(options) {
+    const id = uuidv4();
+    const win = new BrowserWindow({
+      width: 1800,
+      height: 1600,
+      webPreferences: {
+        preload: path.join(__dirname, 'preload.js'), // 设置预加载脚本路径
+        webSecurity: false,
+        nodeIntegration: false,
+        contextIsolation: true,  // 关闭上下文隔离，允许 <webview> 中的网页访问 Node.js API
+        webviewTag: true,  // 允许使用 <webview> 标签
+        nativeWindowOpen: true // 启用 nativeWindowOpen
+      },
+      frame: false,
+    });
+    this.windows[id] = win;
+    win.on('closed', () => {
+      // 清理已关闭的窗口
+      delete this.windows[id];
+    });
+    return { id, win };
+  }
+
+  createMainWindow() {
+    const { id, win } = this.createWindow();
+    if (process.env.WEBPACK_DEV_SERVER_URL) {
+      // Load the url of the dev server if in development mode
+      win.loadURL(`http://localhost:8080/index.html?id=${id}`);
+      // if (!process.env.IS_TEST) win.webContents.openDevTools();
+    } else {
+      createProtocol("app");
+      // Load the index.html when not in development
+      win.loadURL(`app://./index.html?id=${id}`);
+    }
+    return win;
+  }
+
+  createPopWindow(url) {
+    const { id, win } = this.createWindow();
+    if (process.env.WEBPACK_DEV_SERVER_URL) {
+      // Load the url of the dev server if in development mode
+      win.loadURL(`http://localhost:8080/popPage.html?url=${url}&id=${id}`);
+      // if (!process.env.IS_TEST) win.webContents.openDevTools();
+    } else {
+      createProtocol("app");
+      // Load the index.html when not in development
+      win.loadURL(`app://./popPage.html?url=${url}&id=${id}`);
+    }
+
+    return win;
+  }
+
+  // 获取所有窗口
+  getAllWindows() {
+    return this.windows;
+  }
+
+  // 关闭特定窗口
+  closeWindow(id) {
+    const win = this.windows[id];
+    if (win) {
+      win.close();
+    } else {
+      console.error(`Window with ID ${id} does not exist.`);
+    }
+  }
+  // 关闭所有窗口
+  closeAllWindows() {
+    Object.keys(this.windows).forEach(id => this.closeWindow(id));
+  }
+
+  // 最小化特定窗口
+  minimizeWindow(id) {
+    const win = this.windows[id];
+    if (win) {
+      win.minimize();
+    } else {
+      console.error(`Window with ID ${id} does not exist.`);
+    }
+  }
+  // 最小化所有窗口
+  minimizeAllWindows() {
+    Object.keys(this.windows).forEach(id => this.minimizeWindow(id));
+  }
+
+
+  // 最大化特定窗口
+  maximizeWindow(id) {
+    const win = this.windows[id];
+    if (win) {
+      if (win.isMaximized()) {
+        win.unmaximize();
+      } else {
+        win.maximize();
+      }
+    } else {
+      console.error(`Window with ID ${id} does not exist.`);
+    }
+  }
+  // 最大化所有窗口
+  maximizeAllWindows() {
+    Object.keys(this.windows).forEach(id => this.maximizeWindow(id));
+  }
+
+  // // 恢复所有窗口（从最大化状态）
+  // restoreAllWindows() {
+  //   this.windows.forEach(win => win.restore());
+  // }
 }
+const windowManager = new WindowManager();
 
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
@@ -52,7 +140,7 @@ app.on("window-all-closed", () => {
 app.on("activate", () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  if (BrowserWindow.getAllWindows().length === 0) windowManager.createMainWindow();
 });
 
 // This method will be called when Electron has finished
@@ -68,11 +156,8 @@ app.on("ready", async () => {
     }
   }
 
-  app.on('browser-window-created', (event, window) => {
-    console.log('browser-window-created');
-    // 确保事件只对新创建的窗口生效
-    console.log('1Main BrowserWindow created:', window);
 
+  app.on('browser-window-created', (event, window) => {
     // 修改窗口的样式
     window.setMenuBarVisibility(false); // 隐藏菜单栏
     window.setBackgroundColor('#000'); // 设置背景颜色
@@ -85,30 +170,7 @@ app.on("ready", async () => {
     console.log('web-contents-created');
     // webContents.openDevTools();
     webContents.setWindowOpenHandler(({ url }) => {
-      const newWin = new BrowserWindow({
-        width: 2800,
-        height: 600,
-        webPreferences: {
-          preload: path.join(__dirname, 'preload.js'), // 设置预加载脚本路径
-          webSecurity: false,
-          nodeIntegration: false,
-          contextIsolation: true,  // 关闭上下文隔离，允许 <webview> 中的网页访问 Node.js API
-          webviewTag: true,  // 允许使用 <webview> 标签
-          nativeWindowOpen: true // 启用 nativeWindowOpen
-        },
-        frame: false,
-      });
-
-      if (process.env.WEBPACK_DEV_SERVER_URL) {
-        // Load the url of the dev server if in development mode
-        newWin.loadURL(`http://localhost:8080/popPage.html?url=${url}`);
-        // if (!process.env.IS_TEST) win.webContents.openDevTools();
-      } else {
-        createProtocol("app");
-        // Load the index.html when not in development
-        newWin.loadURL(`app://./popPage.html?url=${url}`);
-      }
-
+      windowManager.createPopWindow(url);
       return { action: 'deny' }; // 阻止默认行为，由我们手动处理
     });
   });
@@ -122,24 +184,21 @@ app.on("ready", async () => {
     return 'pong1';
   });
 
-  let mainWindow = await createWindow();
-  ipcMain.on('window-minimize', () => {
-    console.log(mainWindow);
-    mainWindow.minimize();
+  // let mainWindow = await createWindow();
+  ipcMain.on('window-minimize', (id) => {
+    console.log(id);
+    windowManager.minimizeWindow(JSON.stringify(id));
   });
 
-  ipcMain.on('window-maximize', () => {
-    if (mainWindow.isMaximized()) {
-      mainWindow.unmaximize();
-    } else {
-      mainWindow.maximize();
-    }
+  ipcMain.on('window-maximize', (id) => {
+    windowManager.maximizeWindow(id);
   });
 
-  ipcMain.on('window-close', () => {
-    mainWindow.close();
+  ipcMain.on('window-close', (id) => {
+    windowManager.closeWindow(id);
   });
   
+  windowManager.createMainWindow()
 });
 
 // Exit cleanly on request from parent process in development mode.

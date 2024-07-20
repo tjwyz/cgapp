@@ -13,20 +13,25 @@
 export default {
   name: 'CgHeader',
   mounted() {
+    this.id = this.getUrlParam(location.href, 'id');
   },
   methods: {
     minimizeWindow() {
-      console.log(jsBridge.invoke('ping1'));
-      jsBridge.send('window-minimize');
+      jsBridge.send('window-minimize', this.id);
     },
     maximizeWindow() {
-      jsBridge.send('window-maximize');
+      jsBridge.send('window-maximize', this.id);
     },
     closeWindow() {
-      jsBridge.send('window-close');
+      jsBridge.send('window-close', this.id);
+    },
+    getUrlParam(url, paramName) {
+      const regex = new RegExp('[?&]' + paramName + '=([^&#]*)', 'i');
+      const match = url.match(regex);
+      return match ? decodeURIComponent(match[1]) : null;
     }
   }
-}
+};
 </script>
 
 <style scoped>

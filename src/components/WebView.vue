@@ -1,12 +1,13 @@
 <template>
-  <webview id="example-webview" src="https://www.msn.com/zh-cn/play" nodeintegration allowpopups></webview>
+  <webview id="example-webview" :src="url" nodeintegration allowpopups></webview>
 </template>
 
 <script>
-
-
 export default {
-  name: "Game",
+  name: "CgWebView",
+  props: {
+    url: String
+  },
   components: {
   },
   mounted() {

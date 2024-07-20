@@ -3,7 +3,10 @@
     <CgHeader></CgHeader>
     <div class="page-container">
       <CgNav></CgNav>
-      <router-view></router-view> <!-- 显示匹配的组件 -->
+      <div class="view-container">
+        <CgWebView v-show="$route.path == '/'" url="https://www.msn.com/zh-cn/play"/>
+        <CgWebView v-show="$route.path == '/tool'" url="https://www.msn.com"/>
+      </div>
     </div>
   </div>
 </template>
@@ -11,11 +14,13 @@
 <script>
 import CgHeader from './components/Header.vue';
 import CgNav from './components/Nav.vue';
+import CgWebView from './components/WebView.vue';
 export default {
   name: 'App',
   components: {
     CgHeader,
-    CgNav
+    CgNav,
+    CgWebView
   }
 };
 </script>
@@ -25,7 +30,6 @@ export default {
 body, #app {
   margin: 0;
 }
-
 .page-container {
   position: absolute;
   width: 100%;
@@ -33,5 +37,9 @@ body, #app {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.view-container {
+  width: calc(100% - 80px);
+  height: 100%;
 }
 </style>

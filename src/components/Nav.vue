@@ -1,7 +1,7 @@
 <template>
   <div class="nav-container">
-    <div class="nav-item">Game</div>
-    <div class="nav-item">Tool</div>
+    <div class="nav-item" @click="gotoGame">Game</div>
+    <div class="nav-item" @click="gotoTool">Tool</div>
   </div>
 </template>
 
@@ -11,17 +11,18 @@ export default {
   mounted() {
   },
   methods: {
-    minimizeWindow() {
-      jsBridge.send('window-minimize');
+    gotoGame() {
+      if (this.$route.path !== '/') {
+        this.$router.push('/');
+      }
     },
-    maximizeWindow() {
-      jsBridge.send('window-maximize');
+    gotoTool() {
+      if (this.$route.path !== '/tool') {
+        this.$router.push('/tool');
+      }
     },
-    closeWindow() {
-      jsBridge.send('window-close');
-    }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -38,5 +39,11 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  -webkit-app-region: no-drag; /* 禁止按钮区域拖动 */
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
 }
 </style>

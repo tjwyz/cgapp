@@ -6,7 +6,7 @@
 
 
 export default {
-  name: "Game",
+  name: "Tool",
   components: {
   },
   mounted() {
@@ -19,7 +19,7 @@ export default {
 
 <style scoped>
 #example-webview {
-  width: calc(100% - 80px);
+  width: 100%;
   height: 100%;
 }
 </style>
