@@ -1,6 +1,9 @@
 <template>
   <!-- <webview id="example-webview" :src="url" nodeintegration allowpopups></webview> -->
-  <div id="example-webview"><button @click="gotoNetease">Netease cloud music</button></div>
+  <div id="example-webview">
+    <button @click="gotoNetease">Netease cloud music</button>
+    <button @click="shortCut">shortCut</button>
+  </div>
 </template>
 
 <script>
@@ -17,7 +20,12 @@ export default {
     async gotoNetease() {
       const result = await jsBridge.invoke('open-thirdpart', 'orpheus://');
       console.log(result);
+    },
+    async shortCut() {
+      const result = await jsBridge.invoke('short-cut');
+      console.log(result);
     }
+
   }
 };
 </script>

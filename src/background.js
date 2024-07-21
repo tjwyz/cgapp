@@ -2,6 +2,7 @@
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const { exec } = require('child_process');
+
 import { app, protocol, BrowserWindow, ipcMain } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
@@ -129,6 +130,13 @@ class WindowManager {
 }
 const windowManager = new WindowManager();
 
+function createShortcut() {
+    const desktopPath = app.getPath('desktop');
+    const shortcutPath = path.join(desktopPath, 'MyElectronApp.lnk');
+    const targetPath = process.execPath; // 当前应用程序的路径
+    const iconPath = path.join(__dirname, 'icon.ico'); // 图标文件路径
+}
+
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
   // On macOS it is common for applications and their menu bar
@@ -197,6 +205,10 @@ app.on("ready", async () => {
     windowManager.closeWindow(windowId);
   });
 
+
+  ipcMain.handle('short-cut', (event, windowId) => {
+    createShortcut();
+  });
 
   // 如果是 Windows 平台，注册应用为处理 'cgapp' 协议的默认客户端
   app.setAsDefaultProtocolClient('cgapp');

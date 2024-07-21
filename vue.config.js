@@ -31,7 +31,8 @@ module.exports = defineConfig({
           output: 'dist_electron'
         },
         files: [
-          '**/*'
+          '**/*',
+          "icon.ico"
         ],
         extraResources: [
           {
@@ -61,7 +62,7 @@ module.exports = defineConfig({
         },
         win: {
           target: 'nsis',
-          icon: 'build/icon.ico'
+          icon: 'build/favicon.ico'
         }
       }
     }
