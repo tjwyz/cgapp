@@ -1,10 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 
-// 引入你的组件
-import Game from '../page/Game.vue';
-import Tool from '../page/Tool.vue';
-
 Vue.use(Router);
 
 export default new Router({
@@ -13,12 +9,14 @@ export default new Router({
     {
       path: '/',
       name: 'Game',
-      component: Game
+    },
+    {
+      path: '/msn',
+      name: 'Msn',
     },
     {
       path: '/tool',
       name: 'Tool',
-      component: Tool
     }
   ]
 });

@@ -5,7 +5,8 @@
       <CgNav></CgNav>
       <div class="view-container">
         <CgWebView v-show="$route.path == '/'" url="https://www.msn.com/zh-cn/play"/>
-        <CgWebView v-show="$route.path == '/tool'" url="https://www.msn.com"/>
+        <CgWebView v-show="$route.path == '/msn'" url="https://www.msn.com"/>
+        <CgToolPage v-show="$route.path == '/tool'"/>
       </div>
     </div>
   </div>
@@ -15,12 +16,14 @@
 import CgHeader from './components/Header.vue';
 import CgNav from './components/Nav.vue';
 import CgWebView from './components/WebView.vue';
+import CgToolPage from './components/ToolPage.vue'
 export default {
   name: 'App',
   components: {
     CgHeader,
     CgNav,
-    CgWebView
+    CgWebView,
+    CgToolPage
   }
 };
 </script>

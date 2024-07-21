@@ -1,6 +1,7 @@
 "use strict";
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+const { exec } = require('child_process');
 import { app, protocol, BrowserWindow, ipcMain } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
@@ -147,6 +148,9 @@ app.on("activate", () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", async () => {
+
+  app.commandLine.appendSwitch('remote-debugging-port', '9222');
+
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {
@@ -155,7 +159,6 @@ app.on("ready", async () => {
       console.error("Vue Devtools failed to install:", e.toString());
     }
   }
-
 
   app.on('browser-window-created', (event, window) => {
     // 修改窗口的样式
@@ -167,7 +170,6 @@ app.on("ready", async () => {
 
   // 处理新窗口的打开
   app.on('web-contents-created', (event, webContents) => {
-    console.log('web-contents-created');
     // webContents.openDevTools();
     webContents.setWindowOpenHandler(({ url }) => {
       windowManager.createPopWindow(url);
@@ -175,30 +177,49 @@ app.on("ready", async () => {
     });
   });
 
-  ipcMain.handle('ping', () => {
-    console.log('pong');
-    return 'pong';
-  });
-  ipcMain.handle('ping1', () => {
-    console.log('pong1');
-    return 'pong1';
-  });
-
-  // let mainWindow = await createWindow();
-  ipcMain.on('window-minimize', (id) => {
-    console.log(id);
-    windowManager.minimizeWindow(JSON.stringify(id));
+  ipcMain.handle('open-thirdpart', (event, link) => {
+    return new Promise((resolve, reject) => {
+      exec(`start ${link}`, (error, stdout, stderr) => {
+        resolve({ error, stdout, stderr });
+      });
+    });
   });
 
-  ipcMain.on('window-maximize', (id) => {
-    windowManager.maximizeWindow(id);
+  ipcMain.on('window-minimize', (event, windowId) => {
+    windowManager.minimizeWindow(windowId);
   });
 
-  ipcMain.on('window-close', (id) => {
-    windowManager.closeWindow(id);
+  ipcMain.on('window-maximize', (event, windowId) => {
+    windowManager.maximizeWindow(windowId);
   });
-  
-  windowManager.createMainWindow()
+
+  ipcMain.on('window-close', (event, windowId) => {
+    windowManager.closeWindow(windowId);
+  });
+
+
+  // 如果是 Windows 平台，注册应用为处理 'cgapp' 协议的默认客户端
+  app.setAsDefaultProtocolClient('cgapp');
+
+  // 处理启动参数
+  const args = process.argv.slice(1); // 获取启动参数
+  let invokedBySuperLink = 'cgapp://pop?url=baidu';
+  args.forEach((arg) => {
+    if (arg.startsWith('cgapp://')) {
+      invokedBySuperLink = arg;
+    }
+  });
+  if (invokedBySuperLink) {
+    const regex = /^cgapp:\/\/pop\/\?url=([^&]*)/;
+    const match = invokedBySuperLink.match(regex);
+    if (match && match[1]) {
+      windowManager.createPopWindow(decodeURIComponent(match[1]));
+    } else {
+      windowManager.createMainWindow();
+    }
+  } else {
+    windowManager.createMainWindow();
+  }
 });
 
 // Exit cleanly on request from parent process in development mode.

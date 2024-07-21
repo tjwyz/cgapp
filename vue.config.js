@@ -44,17 +44,24 @@ module.exports = defineConfig({
             filter: ['**/*']
           }
         ],
+        protocols: [
+          {
+            name: "MyApp Protocol",
+            schemes: ["cgapp"]
+          }
+        ],
+        nsis: {
+          oneClick: false,
+          perMachine: true,
+          allowToChangeInstallationDirectory: true,
+          createDesktopShortcut: true,
+          createStartMenuShortcut: true,
+          shortcutName: "CGApp",
+          // include: "build/installer.nsh"
+        },
         win: {
           target: 'nsis',
           icon: 'build/icon.ico'
-        },
-        mac: {
-          target: 'dmg',
-          icon: 'build/icon.icns'
-        },
-        linux: {
-          target: 'AppImage',
-          icon: 'build/icon.png'
         }
       }
     }

@@ -1,6 +1,7 @@
 <template>
   <div class="nav-container">
     <div class="nav-item" @click="gotoGame">Game</div>
+    <div class="nav-item" @click="gotoMsn">Msn</div>
     <div class="nav-item" @click="gotoTool">Tool</div>
   </div>
 </template>
@@ -14,6 +15,11 @@ export default {
     gotoGame() {
       if (this.$route.path !== '/') {
         this.$router.push('/');
+      }
+    },
+    gotoMsn() {
+      if (this.$route.path !== '/msn') {
+        this.$router.push('/msn');
       }
     },
     gotoTool() {
