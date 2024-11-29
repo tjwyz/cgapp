@@ -1,12 +1,13 @@
 {
   "name": "cg-vue-electron-app",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "electron:build": "vue-cli-service electron:build",
+    "electron:push": "vue-cli-service electron:build --publish=always",
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps"
@@ -14,6 +15,7 @@
   "main": "background.js",
   "dependencies": {
     "core-js": "^3.8.3",
+    "electron-updater": "^6.3.9",
     "vue": "^2.6.14"
   },
   "devDependencies": {
@@ -33,6 +35,7 @@
     "uuid": "^8.3.2",
     "vue-cli-plugin-electron-builder": "~2.1.1",
     "vue-router": "^3.6.5",
-    "vue-template-compiler": "^2.6.14"
+    "vue-svg-loader": "^0.16.0",
+    "vue-template-compiler": "^2.7.16"
   }
 }

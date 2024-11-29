@@ -3,6 +3,7 @@
   <div id="example-webview">
     <button @click="gotoNetease">Netease cloud music</button>
     <button @click="shortCut">shortCut</button>
+    {{version}}
   </div>
 </template>
 
@@ -14,7 +15,17 @@ export default {
   },
   components: {
   },
+  data() {
+    return {
+      version: '0.0.0'
+    };
+  },
   mounted() {
+    setTimeout(() => {
+      window?.jsBridge?.getVersion().then(val => {
+        this.version = val;
+      });
+    }, 1000)
   },
   methods: {
     async gotoNetease() {
@@ -23,7 +34,6 @@ export default {
     },
     async shortCut() {
       const result = await jsBridge.invoke('short-cut');
-      console.log(result);
     }
 
   }

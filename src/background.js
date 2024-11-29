@@ -3,7 +3,8 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const { exec } = require('child_process');
 
-import { app, protocol, BrowserWindow, ipcMain } from "electron";
+import { app, protocol, BrowserWindow, ipcMain, dialog  } from "electron";
+import { autoUpdater } from "electron-updater";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 const isDevelopment = process.env.NODE_ENV !== "production";
@@ -129,6 +130,7 @@ class WindowManager {
   // }
 }
 const windowManager = new WindowManager();
+let updateReady = false;
 
 function createShortcut() {
     const desktopPath = app.getPath('desktop');
@@ -173,7 +175,7 @@ app.on("ready", async () => {
     window.setMenuBarVisibility(false); // 隐藏菜单栏
     window.setBackgroundColor('#000'); // 设置背景颜色
     window.setResizable(true); // 允许调整窗口大小
-    window.webContents.openDevTools();
+    // window.webContents.openDevTools();
   });
 
   // 处理新窗口的打开
@@ -183,6 +185,13 @@ app.on("ready", async () => {
       windowManager.createPopWindow(url);
       return { action: 'deny' }; // 阻止默认行为，由我们手动处理
     });
+  });
+
+  // 在应用关闭时安装更新
+  app.on('before-quit', (event) => {
+    if (updateReady) {
+      autoUpdater.quitAndInstall(); // 用户关闭时才安装更新
+    }
   });
 
   ipcMain.handle('open-thirdpart', (event, link) => {
@@ -209,6 +218,9 @@ app.on("ready", async () => {
   ipcMain.handle('short-cut', (event, windowId) => {
     createShortcut();
   });
+  ipcMain.handle('get-app-version', () => {
+    return app.getVersion();
+  });
 
   // 如果是 Windows 平台，注册应用为处理 'cgapp' 协议的默认客户端
   app.setAsDefaultProtocolClient('cgapp');
@@ -232,7 +244,51 @@ app.on("ready", async () => {
   } else {
     windowManager.createMainWindow();
   }
+
+  // 检查更新
+  checkForUpdates();
 });
+
+// function checkForUpdates() {
+//   console.log(0);
+//   autoUpdater.checkForUpdatesAndNotify();
+
+//   // 监听更新事件
+//   autoUpdater.on('update-available', () => {
+//     dialog.showMessageBox({
+//       type: 'info',
+//       title: 'Update Available',
+//       message: 'A new version is available. Downloading now...',
+//       buttons: ['OK']
+//     });
+//   });
+
+//   autoUpdater.on('update-downloaded', () => {
+//     dialog.showMessageBox({
+//       type: 'info',
+//       title: 'Update Ready',
+//       message: 'A new version has been downloaded. Restart the application to apply the update.',
+//       buttons: ['Restart', 'Later']
+//     }).then(result => {
+//       if (result.response === 0) { // 如果用户选择了“Restart”
+//         autoUpdater.quitAndInstall();
+//       }
+//     });
+//   });
+
+//   autoUpdater.on('error', (error) => {
+//     console.error('Update error:', error);
+//   });
+// }
+
+function checkForUpdates() {
+  // 检查更新并在后台静默下载
+  autoUpdater.on('update-downloaded', () => {
+    updateReady = true; // 标记更新已准备好
+  });
+
+  autoUpdater.checkForUpdates();
+}
 
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {

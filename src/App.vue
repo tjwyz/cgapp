@@ -2,7 +2,7 @@
   <div id="app">
     <CgHeader></CgHeader>
     <div class="page-container">
-      <CgNav></CgNav>
+      <!-- <CgNav></CgNav> -->
       <div class="view-container">
         <CgWebView v-show="$route.path == '/'" url="https://www.msn.com/zh-cn/play"/>
         <CgWebView v-show="$route.path == '/msn'" url="https://www.msn.com"/>
@@ -17,6 +17,7 @@ import CgHeader from './components/Header.vue';
 import CgNav from './components/Nav.vue';
 import CgWebView from './components/WebView.vue';
 import CgToolPage from './components/ToolPage.vue'
+
 export default {
   name: 'App',
   components: {
@@ -42,7 +43,8 @@ body, #app {
   justify-content: center;
 }
 .view-container {
-  width: calc(100% - 80px);
+  /*  width: calc(100% - 80px);*/
+  width: 100%;
   height: 100%;
 }
 </style>

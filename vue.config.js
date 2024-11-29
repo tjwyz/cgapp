@@ -3,8 +3,19 @@ const { defineConfig } = require("@vue/cli-service");
 module.exports = defineConfig({
   publicPath: './',
   outputDir: 'dist',
+  chainWebpack: config => {
+    config.module.rules.delete("svg");
+  },
   configureWebpack: {
     devtool: 'source-map',
+    module: {
+      rules: [
+        {
+          test: /\.svg$/,
+          loader: 'vue-svg-loader'
+        }
+      ]
+    }
   },
   pages: {
     index: {
@@ -27,6 +38,14 @@ module.exports = defineConfig({
         // 在这里添加更多 electron-builder 配置选项，例如打包配置等
         appId: 'com.microsoft.cgapp',
         productName: 'MyApp',
+        publish: [
+          {
+            provider: 'github',
+            owner: 'tjwyz',
+            repo: 'cgapp',
+            token: ''
+          }
+        ],
         directories: {
           output: 'dist_electron'
         },
@@ -52,9 +71,10 @@ module.exports = defineConfig({
           }
         ],
         nsis: {
-          oneClick: false,
+          oneClick: true,
+          allowToChangeInstallationDirectory: false,
+          differentialPackage: true,
           perMachine: true,
-          allowToChangeInstallationDirectory: true,
           createDesktopShortcut: true,
           createStartMenuShortcut: true,
           shortcutName: "CGApp",

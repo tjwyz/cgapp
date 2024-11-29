@@ -1,17 +1,30 @@
 <template>
   <div class="title-bar">
-    <div class="title">My C1ustom Electron App</div>
+    <div class="title">
+      <LogoSvg :style="{ marginRight: '6px' }"/>
+      Windows Gaming App
+    </div>
     <div class="window-controls">
-      <button @click="minimizeWindow">-</button>
-      <button @click="maximizeWindow">[ ]</button>
-      <button @click="closeWindow">X</button>
+      <button @click="minimizeWindow"><MinSvg/></button>
+      <button @click="maximizeWindow"><MaxSvg/></button>
+      <button @click="closeWindow"><CloseSvg/></button>
     </div>
   </div>
 </template>
 
 <script>
+import LogoSvg from '../assets/logo.svg';
+import MinSvg from '../assets/min.svg';
+import MaxSvg from '../assets/max.svg';
+import CloseSvg from '../assets/close.svg';
 export default {
   name: 'CgHeader',
+  components: {
+    LogoSvg,
+    MinSvg,
+    MaxSvg,
+    CloseSvg
+  },
   mounted() {
     this.id = this.getUrlParam(location.href, 'id');
   },
@@ -42,12 +55,16 @@ export default {
   justify-content: space-between;
   align-items: center;
   height: 40px;
-  background: #333;
-  color: white;
+  background: #fff;
+  color: #333;
 }
 
 .title-bar .title {
   padding-left: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 16px;
 }
 
 .window-controls {
