@@ -2,40 +2,46 @@
   <div id="app">
     <CgHeader></CgHeader>
     <div class="page-container">
-      <webview id="example-webview" :src="url" nodeintegration allowpopups></webview>
+      <webview
+        id="example-webview"
+        :src="url"
+        nodeintegration
+        allowpopups
+      ></webview>
     </div>
   </div>
 </template>
 
 <script>
-import CgHeader from './components/Header.vue';
+import CgHeader from "./components/Header.vue";
 export default {
-  name: 'Pop',
+  name: "Pop",
   components: {
     CgHeader,
   },
   data() {
     return {
-      url: '' // 初始化 url 属性为空字符串
+      url: "", // 初始化 url 属性为空字符串
     };
   },
   mounted() {
-    this.url = this.getUrlParam(location.href, 'url');
+    let url = this.getUrlParam(location.href, "url");
+    this.url = decodeURIComponent(url);
   },
   methods: {
     getUrlParam(url, paramName) {
-      const regex = new RegExp('[?&]' + paramName + '=([^&#]*)', 'i');
+      const regex = new RegExp("[?&]" + paramName + "=([^&#]*)", "i");
       const match = url.match(regex);
       return match ? decodeURIComponent(match[1]) : null;
-    }
-  }
-
+    },
+  },
 };
 </script>
 
 <style>
 /* 样式 */
-body, #app {
+body,
+#app {
   margin: 0;
 }
 

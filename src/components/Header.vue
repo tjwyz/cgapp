@@ -1,49 +1,65 @@
 <template>
   <div class="title-bar">
     <div class="title">
-      <LogoSvg :style="{ marginRight: '6px' }"/>
-      Windows Gaming App
+      <LogoSvg :style="{ marginRight: '6px' }" />
+      MSN游戏
     </div>
     <div class="window-controls">
-      <button @click="minimizeWindow"><MinSvg/></button>
-      <button @click="maximizeWindow"><MaxSvg/></button>
-      <button @click="closeWindow"><CloseSvg/></button>
+      <button @click="minimizeWindow"><MinSvg /></button>
+      <button @click="maximizeWindow">
+        <component :is="currentIcon" />
+      </button>
+      <button @click="closeWindow"><CloseSvg /></button>
     </div>
   </div>
 </template>
 
 <script>
-import LogoSvg from '../assets/logo.svg';
-import MinSvg from '../assets/min.svg';
-import MaxSvg from '../assets/max.svg';
-import CloseSvg from '../assets/close.svg';
+import LogoSvg from "../assets/logo.svg";
+import MinSvg from "../assets/min.svg";
+import MaxSvg from "../assets/max.svg";
+import RestoreSvg from "../assets/restore.svg";
+import CloseSvg from "../assets/close.svg";
+
 export default {
-  name: 'CgHeader',
+  name: "CgHeader",
   components: {
     LogoSvg,
     MinSvg,
     MaxSvg,
-    CloseSvg
+    RestoreSvg,
+    CloseSvg,
+  },
+  data() {
+    return {
+      maximize: true
+    }
+  },
+  computed: {
+    currentIcon() {
+      return !this.maximize ? 'RestoreSvg' : 'MaxSvg';
+    },
   },
   mounted() {
-    this.id = this.getUrlParam(location.href, 'id');
+    this.id = this.getUrlParam(location.href, "id");
   },
   methods: {
     minimizeWindow() {
-      jsBridge.send('window-minimize', this.id);
+      window?.jsBridge?.send("window-minimize", this.id);
     },
     maximizeWindow() {
-      jsBridge.send('window-maximize', this.id);
+      window?.jsBridge?.send("window-maximize", this.id);
+      this.maximize = !this.maximize;
     },
     closeWindow() {
-      jsBridge.send('window-close', this.id);
+      window?.jsBridge?.send("window-close", this.id);
     },
     getUrlParam(url, paramName) {
-      const regex = new RegExp('[?&]' + paramName + '=([^&#]*)', 'i');
+      const regex = new RegExp("[?&]" + paramName + "=([^&#]*)", "i");
       const match = url.match(regex);
       return match ? decodeURIComponent(match[1]) : null;
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -57,6 +73,7 @@ export default {
   height: 40px;
   background: #fff;
   color: #333;
+  font-family: system-ui;
 }
 
 .title-bar .title {
@@ -69,7 +86,7 @@ export default {
 
 .window-controls {
   display: flex;
-  gap: 10px;
+  gap: 16px;
   padding-right: 10px;
 }
 
@@ -79,6 +96,10 @@ export default {
   color: white;
   cursor: pointer;
   -webkit-app-region: no-drag; /* 禁止按钮区域拖动 */
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  padding: 0;
 }
 
 .window-controls button:hover {

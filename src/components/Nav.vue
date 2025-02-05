@@ -8,26 +8,25 @@
 
 <script>
 export default {
-  name: 'CgNav',
-  mounted() {
-  },
+  name: "CgNav",
+  mounted() {},
   methods: {
     gotoGame() {
-      if (this.$route.path !== '/') {
-        this.$router.push('/');
+      if (this.$route.path !== "/") {
+        this.$router.push("/");
       }
     },
     gotoMsn() {
-      if (this.$route.path !== '/msn') {
-        this.$router.push('/msn');
+      if (this.$route.path !== "/msn") {
+        this.$router.push("/msn");
       }
     },
     gotoTool() {
-      if (this.$route.path !== '/tool') {
-        this.$router.push('/tool');
+      if (this.$route.path !== "/tool") {
+        this.$router.push("/tool");
       }
     },
-  }
+  },
 };
 </script>
 

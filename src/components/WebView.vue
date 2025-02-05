@@ -1,20 +1,21 @@
 <template>
-  <webview id="example-webview" :src="url" nodeintegration allowpopups></webview>
+  <webview
+    id="example-webview"
+    :src="url"
+    nodeintegration
+    allowpopups
+  ></webview>
 </template>
 
 <script>
 export default {
   name: "CgWebView",
   props: {
-    url: String
+    url: String,
   },
-  components: {
-  },
-  mounted() {
-  },
-  methods: {
-
-  }
+  components: {},
+  mounted() {},
+  methods: {},
 };
 </script>
 

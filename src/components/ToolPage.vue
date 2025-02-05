@@ -3,7 +3,7 @@
   <div id="example-webview">
     <button @click="gotoNetease">Netease cloud music</button>
     <button @click="shortCut">shortCut</button>
-    {{version}}
+    {{ version }}
   </div>
 </template>
 
@@ -11,32 +11,33 @@
 export default {
   name: "CgToolPage",
   props: {
-    url: String
+    url: String,
   },
-  components: {
-  },
+  components: {},
   data() {
     return {
-      version: '0.0.0'
+      version: "0.0.0",
     };
   },
   mounted() {
     setTimeout(() => {
-      window?.jsBridge?.getVersion().then(val => {
+      window?.jsBridge?.getVersion().then((val) => {
         this.version = val;
       });
-    }, 1000)
+    }, 1000);
   },
   methods: {
     async gotoNetease() {
-      const result = await jsBridge.invoke('open-thirdpart', 'orpheus://');
+      const result = await window?.jsBridge?.invoke(
+        "open-thirdpart",
+        "orpheus://"
+      );
       console.log(result);
     },
     async shortCut() {
-      const result = await jsBridge.invoke('short-cut');
-    }
-
-  }
+      const result = await window?.jsBridge?.invoke("short-cut");
+    },
+  },
 };
 </script>
 

@@ -12,10 +12,11 @@ module.exports = {
     parser: "@babel/eslint-parser",
   },
   rules: {
-    'no-console': 'off',
-    'no-debugger': 'off',
-    'vue/max-attributes-per-line': 'off', // 禁用某些规则
-    'no-unused-vars': 'off',
-    'vue/no-parsing-error': 'off'
+    "no-console": "off",
+    "no-debugger": "off",
+    "vue/max-attributes-per-line": "off", // 禁用某些规则
+    "no-unused-vars": "off",
+    "vue/no-parsing-error": "off",
+    "vue/multi-word-component-names": "off",
   },
 };
